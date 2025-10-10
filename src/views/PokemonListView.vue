@@ -171,7 +171,7 @@
 	const showOnlyFavorites = ref(false);
 	const listContainer = ref<HTMLElement | null>(null);
 
-	// Modal state
+	// Modal
 	const selectedPokemon = ref<Pokemon | null>(null);
 	const showModal = ref(false);
 
@@ -194,6 +194,7 @@
 		}
 	};
 
+	// Filtrado de pokémones
 	const filteredPokemons = computed(() => {
 		let filtered = pokemonStore.pokemons;
 
@@ -230,7 +231,7 @@
 		showOnlyFavorites.value = false;
 	};
 
-	// Modal handlers
+	// Manejador del modal
 	const openPokemonDetail = async (pokemon: Pokemon) => {
 		selectedPokemon.value = pokemon;
 		showModal.value = true;
@@ -248,7 +249,6 @@
 	onMounted(() => {
 		// Limpiar duplicados existentes al montar
 		pokemonStore.removeDuplicates();
-
 
 		if (listContainer.value) {
 			listContainer.value.addEventListener('scroll', handleScroll);

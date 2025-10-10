@@ -35,7 +35,6 @@
 	const router = useRouter();
 
 	const handleGetStarted = (): void => {
-		// router.push('/pokedex');
 		router.push({ name: 'loading' });
 	};
 </script>

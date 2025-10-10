@@ -1,7 +1,7 @@
 <template>
 	<BaseModal :show="show" @close="emit('close')">
 		<div class="bg-white rounded-lg overflow-hidden shadow-2xl relative w-[315px] md:w-[570px] h-[506px]">
-			<!-- Close button -->
+			<!-- Botón cerrar -->
 			<button
 				@click="emit('close')"
 				class="absolute top-4 right-4 z-20 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
@@ -160,7 +160,6 @@
 	const shareToFriends = async () => {
 		if (!props.pokemon) return;
 
-		// const shareText = `${formattedName.value}, ${props.pokemon.weight}, ${props.pokemon.height}, ${formattedTypes.value}`;
 		const shareText = `Name: ${formattedName.value}, Weight: ${props.pokemon.weight}, Height: ${props.pokemon.height}, Types: ${formattedTypes.value}`;
 
 		await copyToClipboard(shareText);
