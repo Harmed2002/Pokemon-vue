@@ -49,7 +49,7 @@
 1. **Clonar el repositorio**
 
     ```bash
-    git clone https://github.com/HaroldMedina2025/Xamaritan.git
+    git clone https://github.com/Harmed2002/Pokemon-vue.git
 
     ```
 
