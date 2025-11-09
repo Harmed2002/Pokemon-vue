@@ -6,9 +6,21 @@ export default mergeConfig(
 	viteConfig,
 	defineConfig({
 		test: {
+			globals: true,
 			environment: 'jsdom',
 			exclude: [...configDefaults.exclude, 'e2e/**'],
 			root: fileURLToPath(new URL('./', import.meta.url)),
+			setupFiles: ['./tests/setup.ts'],
+			coverage: {
+				provider: 'v8',
+				reporter: ['text', 'json', 'html'],
+				exclude: [
+					...configDefaults.coverage.exclude || [],
+					'tests/',
+					'*.config.ts',
+					'src/main.ts',
+				],
+			},
 		},
 	}),
 );

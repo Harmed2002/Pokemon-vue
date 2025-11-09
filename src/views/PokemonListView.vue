@@ -1,8 +1,11 @@
 <template>
 	<div class="min-h-screen bg-gray-50 flex items-center justify-center py-8 px-4">
-		<div class="w-full max-w-3xl flex flex-col" style="height: 60px; max-height: 80vh; min-height: 400px; width: 570px;">
+		<div
+			class="w-full max-w-3xl flex flex-col"
+			style="height: 60px; max-height: 80vh; min-height: 400px; width: 570px"
+		>
 			<div class="flex-1 bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col">
-				<!-- Search -->
+				<!-- Búsqueda -->
 				<div class="px-6 py-4 bg-white border-b border-gray-100">
 					<div class="relative">
 						<svg
@@ -22,30 +25,39 @@
 							v-model="searchQuery"
 							type="text"
 							placeholder="Search"
+							data-testid="search-input"
 							class="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-0 rounded-[5px] text-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-colors"
 						/>
 					</div>
 				</div>
 
-				<!-- Pokemon list -->
-				<div ref="listContainer" class="flex-1 overflow-y-auto">
+				<!-- Lista de Pokémon -->
+				<div
+					ref="listContainer"
+					data-testid="list-container"
+					class="flex-1 overflow-y-auto"
+				>
 					<div v-if="hasResults">
 						<div
 							v-for="pokemon in filteredPokemons"
 							:key="pokemon.id"
+							data-testid="pokemon-item"
 							class="w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
 						>
-							<!-- Pokemon name (clickable) -->
+							<!-- Nombre del Pokémon (clickeable) -->
 							<button
 								@click="openPokemonDetail(pokemon)"
+								data-testid="pokemon-name"
 								class="text-gray-900 font-normal text-base text-left hover:text-red-500 transition-colors"
 							>
 								{{ formatName(pokemon.name) }}
 							</button>
 
-							<!-- Favorite star -->
+							<!-- Estrella de Favorito -->
 							<button
 								@click.stop="favoritesStore.toggleFavorite(pokemon.id)"
+								data-testid="favorite-star"
+								:data-favorite="favoritesStore.isFavorite(pokemon.id)"
 								class="flex-shrink-0"
 							>
 								<svg
@@ -68,6 +80,7 @@
 					<!-- Loading -->
 					<div
 						v-if="pokemonStore.isLoadingMore && !showOnlyFavorites && hasResults"
+						data-testid="loading-indicator"
 						class="flex justify-center items-center py-6"
 					>
 						<div
@@ -75,15 +88,17 @@
 						></div>
 					</div>
 
-					<!-- Empty state -->
+					<!-- Estado vacío -->
 					<div
 						v-if="showEmptyState"
+						data-testid="empty-state"
 						class="flex flex-col items-center justify-center h-full px-8 text-center"
 					>
 						<h2 class="text-3xl font-bold text-gray-800 mb-3">Uh-oh!</h2>
 						<p class="text-gray-600 mb-6">You look lost on your journey!</p>
 						<button
 							@click="resetFilters"
+							data-testid="reset-button"
 							class="bg-red-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-red-600 transition-colors shadow-md"
 						>
 							Go back home
@@ -92,15 +107,17 @@
 				</div>
 			</div>
 
-			<!-- Bottom bar -->
+			<!-- Barra inferior -->
 			<div
 				v-if="hasResults"
+				data-testid="bottom-bar"
 				class="mt-4 bg-white rounded-2xl shadow-lg flex items-center justify-center px-6"
 				style="height: 80px"
 			>
 				<div class="flex gap-4 w-full max-w-md">
 					<button
 						@click="showOnlyFavorites = false"
+						data-testid="all-tab"
 						class="flex-1 h-12 rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-2"
 						:class="
 							!showOnlyFavorites
@@ -121,6 +138,7 @@
 
 					<button
 						@click="showOnlyFavorites = true"
+						data-testid="favorites-tab"
 						class="flex-1 h-12 rounded-full font-semibold text-sm transition-all flex items-center justify-center gap-2"
 						:class="
 							showOnlyFavorites
@@ -150,15 +168,11 @@
 	</div>
 
 	<!-- Modal -->
-	<PokemonDetailModal
-		:pokemon="selectedPokemon"
-		:show="showModal"
-		@close="closeModal"
-	/>
+	<PokemonDetailModal :pokemon="selectedPokemon" :show="showModal" @close="closeModal" />
 </template>
 
 <script setup lang="ts">
-	import { onMounted, ref, computed } from 'vue';
+	import { onMounted, onUnmounted, ref, computed } from 'vue';
 	import { usePokemonStore } from '@/stores/pokemon.store';
 	import { useFavoritesStore } from '@/stores/favorites.store';
 	import PokemonDetailModal from '@/components/PokemonDetailModal.vue';
@@ -175,26 +189,25 @@
 	const selectedPokemon = ref<Pokemon | null>(null);
 	const showModal = ref(false);
 
-	const SCROLL_THRESHOLD = 0.8; // Se usa para avanzar la carga cuando se alcanza el 80% del scroll
+	// Constantes
+	const SCROLL_THRESHOLD = 0.8;
+	const MODAL_CLOSE_DELAY = 300;
 
-	const handleScroll = () => {
+	const handleScroll = (): void => {
 		if (!listContainer.value || showOnlyFavorites.value) return;
 
 		const { scrollTop, scrollHeight, clientHeight } = listContainer.value;
 		const scrollPercentage = (scrollTop + clientHeight) / scrollHeight;
 
-		// Cargar más pokémones cuando se alcanza el umbral
 		if (
 			scrollPercentage > SCROLL_THRESHOLD &&
 			!pokemonStore.isLoadingMore &&
 			pokemonStore.hasMore
-
 		) {
 			pokemonStore.loadMore();
 		}
 	};
 
-	// Filtrado de pokémones
 	const filteredPokemons = computed(() => {
 		let filtered = pokemonStore.pokemons;
 
@@ -203,20 +216,15 @@
 		}
 
 		if (searchQuery.value.trim()) {
-			const query = searchQuery.value.toLowerCase();
+			const query = searchQuery.value.trim().toLowerCase();
 			filtered = filtered.filter((p) => p.name.toLowerCase().includes(query));
 		}
 
-		// Asegurar que no hay duplicados en la vista
+		// Ojo: Deduplicación (esto debería estar en el store)
 		const uniqueMap = new Map<number, Pokemon>();
-
-		filtered.forEach(pokemon => {
-			uniqueMap.set(pokemon.id, pokemon);
-		});
+		filtered.forEach((pokemon) => uniqueMap.set(pokemon.id, pokemon));
 
 		return Array.from(uniqueMap.values());
-
-		// return filtered;
 	});
 
 	const hasResults = computed(() => filteredPokemons.value.length > 0);
@@ -231,27 +239,41 @@
 		showOnlyFavorites.value = false;
 	};
 
-	// Manejador del modal
-	const openPokemonDetail = async (pokemon: Pokemon) => {
+	const openPokemonDetail = (pokemon: Pokemon): void => {
 		selectedPokemon.value = pokemon;
 		showModal.value = true;
 	};
 
-	const closeModal = () => {
+	const closeModal = (): void => {
 		showModal.value = false;
-
-		// Limpiar después de la animación
 		setTimeout(() => {
 			selectedPokemon.value = null;
-		}, 300);
+		}, MODAL_CLOSE_DELAY);
 	};
 
 	onMounted(() => {
-		// Limpiar duplicados existentes al montar
-		pokemonStore.removeDuplicates();
-
 		if (listContainer.value) {
 			listContainer.value.addEventListener('scroll', handleScroll);
 		}
+	});
+
+	onUnmounted(() => {
+		if (listContainer.value) {
+			listContainer.value.removeEventListener('scroll', handleScroll);
+		}
+	});
+
+	// Exponer para tests
+	defineExpose({
+		searchQuery,
+		showOnlyFavorites,
+		selectedPokemon,
+		showModal,
+		filteredPokemons,
+		hasResults,
+		showEmptyState,
+		openPokemonDetail,
+		closeModal,
+		resetFilters,
 	});
 </script>

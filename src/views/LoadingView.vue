@@ -1,18 +1,12 @@
 <template>
-	<div
-		class="min-h-screen bg-white flex flex-col items-center justify-center px-4"
-	>
+	<div class="min-h-screen bg-white flex flex-col items-center justify-center px-4">
 		<div class="relative mb-8">
 			<div class="absolute inset-0 bg-red-500 rounded-full opacity-25 animate-ping"></div>
-			<div
-				class="relative w-32 h-32 bg-white rounded-full border-4 border-gray-900 overflow-hidden"
-			>
+			<div class="relative w-32 h-32 bg-white rounded-full border-4 border-gray-900 overflow-hidden">
 				<div class="absolute top-0 left-0 right-0 h-1/2 bg-red-600"></div>
 				<div class="absolute bottom-0 left-0 right-0 h-1/2 bg-white"></div>
 				<div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-900 -translate-y-1/2"></div>
-				<div
-					class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full border-4 border-gray-900 flex items-center justify-center"
-				>
+				<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full border-4 border-gray-900 flex items-center justify-center">
 					<div class="w-6 h-6 bg-gray-900 rounded-full animate-pulse"></div>
 				</div>
 			</div>
